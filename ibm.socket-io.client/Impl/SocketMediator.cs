@@ -14,6 +14,8 @@ using System.Linq;
 using IBM.SocketIO.Factories;
 using IBM.Webclient;
 using IBM.SocketIO.Exceptions;
+using Microsoft.Extensions.Logging;
+using IBM.SocketIO.Utils;
 
 namespace IBM.SocketIO.Impl
 {
@@ -31,6 +33,7 @@ namespace IBM.SocketIO.Impl
         private string roomPath = null;
         private IClientSocketFactory socketFactory = null;
         private IHttpClientFactory httpFactory = null;
+        private ILogger<SocketMediator> logger = null;
 
         /// <summary>
         /// Used to check connection every configured seconds
@@ -42,12 +45,17 @@ namespace IBM.SocketIO.Impl
         #region Ctor
 
         public SocketMediator(string baseUrl)
+            : this(baseUrl, new ConsoleLogger<SocketMediator>())
+        { }
+
+        public SocketMediator(string baseUrl, ILogger<SocketMediator> logger)
         {
             var uri = new Uri(baseUrl);
             var host = uri.GetLeftPart(UriPartial.Authority);
             this.baseHttpUrl = "http" + host.TrimStart('w', 's') + "/socket.io/?EIO=3";
             this.baseWsUrl = uri.GetLeftPart(UriPartial.Authority) + "/socket.io/?EIO=3";
             this.roomPath = uri.AbsolutePath;
+            this.logger = logger;
 
             this.keepaliveTimer = new System.Timers.Timer();
             this.keepaliveTimer.AutoReset = false;
@@ -117,7 +125,7 @@ namespace IBM.SocketIO.Impl
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine(ex);
+                    logger.LogError(ex, "InitConnection: initial probe request");
                     throw ex;
                 }
             }
@@ -144,7 +152,7 @@ namespace IBM.SocketIO.Impl
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine(ex);
+                    logger.LogError(ex, "InitConnection: roomRequestMessage");
                     throw ex;
                 }
             }
@@ -183,7 +191,7 @@ namespace IBM.SocketIO.Impl
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine(ex);
+                    logger.LogError(ex, "InitConnection: protocolUpgradeRequest");
                     throw ex;
                 }
             }
@@ -211,7 +219,7 @@ namespace IBM.SocketIO.Impl
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    logger.LogError(ex, "InitConnection: finalHandshake");
                     throw ex;
                 }
             }
@@ -232,7 +240,7 @@ namespace IBM.SocketIO.Impl
             }
             catch (Exception connectException)
             {
-                Console.Error.WriteLine(connectException);
+                logger.LogError(connectException, "InitConnection: Upgrade connection and send ping");
                 throw connectException;
             }
 
@@ -348,13 +356,13 @@ namespace IBM.SocketIO.Impl
         {
             try
             {
-                Console.WriteLine("Polling connection status");
+                logger.LogDebug("Polling connection status");
                 await this.SendConnectionProbe(true);
-                Console.WriteLine("Client connected; no work to do");
+                logger.LogDebug("Client connected; no work to do");
             }
             catch (Exception)
             {
-                Console.WriteLine("Client disconnected; attempting to reconnect");
+                logger.LogDebug("Client disconnected; attempting to reconnect");
 
                 if (this.ClientConnectionMade)
                 {
@@ -369,12 +377,12 @@ namespace IBM.SocketIO.Impl
                 catch { }
 
 
-                Console.WriteLine("Attempting to reconnect client");
+                logger.LogDebug("Attempting to reconnect client");
 
                 try
                 {
                     await this.InitConnection(this.httpFactory, this.socketFactory);
-                    Console.WriteLine("Client reconnected");
+                    logger.LogDebug("Client reconnected");
                 }
                 catch (Exception) { }
             }
@@ -382,7 +390,7 @@ namespace IBM.SocketIO.Impl
 
         async void KeepaliveTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            Console.WriteLine("Timer elapsed");
+            logger.LogTrace("Timer elapsed");
 
             //Timer events are queued so another event could run after disposing
             if(this.Disposed)
