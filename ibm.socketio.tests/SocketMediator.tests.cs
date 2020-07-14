@@ -23,24 +23,21 @@ namespace IBM.SocketIO.Tests
         {
             // 1. Initial handshake
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
-            var initialHandshakeClient = new MockHttpClient(initialHandshakeResponse, HttpStatusCode.OK);
-
             var secondaryHandshakeResponse = "ok";
-            var secondaryHandshakeClient = new MockHttpClient(secondaryHandshakeResponse, HttpStatusCode.OK);
-
             var protocolUpgradeResponse = "";
-            var protocolUpgradeClient = new MockHttpClient(protocolUpgradeResponse, HttpStatusCode.SwitchingProtocols);
-            protocolUpgradeClient.AddHeader("Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=");
-
             var finalHandshakeResponse = "15:40/collections,";
-            var finalHandshakeClient = new MockHttpClient(finalHandshakeResponse, HttpStatusCode.OK);
+
+            var mockClient = new MockHttpClient(new MockHttpResponse[] {
+                new MockHttpResponse { DataToReturn = initialHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = secondaryHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = protocolUpgradeResponse, Code = HttpStatusCode.SwitchingProtocols, Headers = new Dictionary<string, string> { { "Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=" } } },
+                new MockHttpResponse { DataToReturn = finalHandshakeResponse, Code = HttpStatusCode.OK },
+            });
 
             var factoryMock = new Mock<IHttpClientFactory>();
-            factoryMock.SetupSequence(f => f.CreateHttpClient())
-                .Returns(initialHandshakeClient)
-                .Returns(secondaryHandshakeClient)
-                .Returns(protocolUpgradeClient)
-                .Returns(finalHandshakeClient);
+            factoryMock.Setup(f => f.CreateHttpClient())
+                .Returns(mockClient)
+                .Verifiable();
 
             var initialProbeResponse = Encoding.UTF8.GetBytes("3probe");
             var secondaryProbeResponse = Encoding.UTF8.GetBytes("5");
@@ -69,24 +66,21 @@ namespace IBM.SocketIO.Tests
         {
             // 1. Initial handshake
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
-            var initialHandshakeClient = new MockHttpClient(initialHandshakeResponse, HttpStatusCode.OK);
-
             var secondaryHandshakeResponse = "ok";
-            var secondaryHandshakeClient = new MockHttpClient(secondaryHandshakeResponse, HttpStatusCode.OK);
-
             var protocolUpgradeResponse = "";
-            var protocolUpgradeClient = new MockHttpClient(protocolUpgradeResponse, HttpStatusCode.SwitchingProtocols);
-            protocolUpgradeClient.AddHeader("Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=");
-
             var finalHandshakeResponse = "15:40/collections,";
-            var finalHandshakeClient = new MockHttpClient(finalHandshakeResponse, HttpStatusCode.OK);
+
+            var mockClient = new MockHttpClient(new MockHttpResponse[] {
+                new MockHttpResponse { DataToReturn = initialHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = secondaryHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = protocolUpgradeResponse, Code = HttpStatusCode.SwitchingProtocols, Headers = new Dictionary<string, string> { { "Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=" } } },
+                new MockHttpResponse { DataToReturn = finalHandshakeResponse, Code = HttpStatusCode.OK },
+            });
 
             var factoryMock = new Mock<IHttpClientFactory>();
-            factoryMock.SetupSequence(f => f.CreateHttpClient())
-                .Returns(initialHandshakeClient)
-                .Returns(secondaryHandshakeClient)
-                .Returns(protocolUpgradeClient)
-                .Returns(finalHandshakeClient);
+            factoryMock.Setup(f => f.CreateHttpClient())
+                .Returns(mockClient)
+                .Verifiable();
 
             var initialProbeResponse = Encoding.UTF8.GetBytes("3probe");
             var secondaryProbeResponse = Encoding.UTF8.GetBytes("5");
@@ -138,24 +132,21 @@ namespace IBM.SocketIO.Tests
         {
             // 1. Initial handshake
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
-            var initialHandshakeClient = new MockHttpClient(initialHandshakeResponse, HttpStatusCode.OK);
-
             var secondaryHandshakeResponse = "ok";
-            var secondaryHandshakeClient = new MockHttpClient(secondaryHandshakeResponse, HttpStatusCode.OK);
-
             var protocolUpgradeResponse = "";
-            var protocolUpgradeClient = new MockHttpClient(protocolUpgradeResponse, HttpStatusCode.SwitchingProtocols);
-            protocolUpgradeClient.AddHeader("Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=");
-
             var finalHandshakeResponse = "15:40/collections,";
-            var finalHandshakeClient = new MockHttpClient(finalHandshakeResponse, HttpStatusCode.OK);
+
+            var mockClient = new MockHttpClient(new MockHttpResponse[] {
+                new MockHttpResponse { DataToReturn = initialHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = secondaryHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = protocolUpgradeResponse, Code = HttpStatusCode.SwitchingProtocols, Headers = new Dictionary<string, string> { { "Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=" } } },
+                new MockHttpResponse { DataToReturn = finalHandshakeResponse, Code = HttpStatusCode.OK },
+            });
 
             var factoryMock = new Mock<IHttpClientFactory>();
-            factoryMock.SetupSequence(f => f.CreateHttpClient())
-                .Returns(initialHandshakeClient)
-                .Returns(secondaryHandshakeClient)
-                .Returns(protocolUpgradeClient)
-                .Returns(finalHandshakeClient);
+            factoryMock.Setup(f => f.CreateHttpClient())
+                .Returns(mockClient)
+                .Verifiable();
 
             // 2. Connection upgrade and handshake
             var socketMock = new Mock<IClientSocket>();
@@ -200,24 +191,21 @@ namespace IBM.SocketIO.Tests
         {
             // 1. Initial handshake
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
-            var initialHandshakeClient = new MockHttpClient(initialHandshakeResponse, HttpStatusCode.OK);
-
             var secondaryHandshakeResponse = "ok";
-            var secondaryHandshakeClient = new MockHttpClient(secondaryHandshakeResponse, HttpStatusCode.OK);
-
             var protocolUpgradeResponse = "";
-            var protocolUpgradeClient = new MockHttpClient(protocolUpgradeResponse, HttpStatusCode.SwitchingProtocols);
-            protocolUpgradeClient.AddHeader("Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=");
-
             var finalHandshakeResponse = "15:40/collections,";
-            var finalHandshakeClient = new MockHttpClient(finalHandshakeResponse, HttpStatusCode.OK);
+
+            var mockClient = new MockHttpClient(new MockHttpResponse[] {
+                new MockHttpResponse { DataToReturn = initialHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = secondaryHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = protocolUpgradeResponse, Code = HttpStatusCode.SwitchingProtocols, Headers = new Dictionary<string, string> { { "Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=" } } },
+                new MockHttpResponse { DataToReturn = finalHandshakeResponse, Code = HttpStatusCode.OK },
+            });
 
             var factoryMock = new Mock<IHttpClientFactory>();
-            factoryMock.SetupSequence(f => f.CreateHttpClient())
-                .Returns(initialHandshakeClient)
-                .Returns(secondaryHandshakeClient)
-                .Returns(protocolUpgradeClient)
-                .Returns(finalHandshakeClient);
+            factoryMock.Setup(f => f.CreateHttpClient())
+                .Returns(mockClient)
+                .Verifiable();
 
             // 2. Connection upgrade and handshake
             var socketMock = new Mock<IClientSocket>();
@@ -264,14 +252,18 @@ namespace IBM.SocketIO.Tests
         public async Task HandleSecondHandshakeFailureCorrectly()
         {
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
-            var initialHandshakeClient = new MockHttpClient(initialHandshakeResponse, HttpStatusCode.OK);
+            var secondaryHandshakeResponse = "";
 
-            var secondaryHandshakeClient = new MockHttpClient("", HttpStatusCode.RequestTimeout);
+
+            var mockClient = new MockHttpClient(new MockHttpResponse[] {
+                new MockHttpResponse { DataToReturn = initialHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = secondaryHandshakeResponse, Code = HttpStatusCode.RequestTimeout },
+            });
 
             var factoryMock = new Mock<IHttpClientFactory>();
-            factoryMock.SetupSequence(f => f.CreateHttpClient())
-                .Returns(initialHandshakeClient)
-                .Returns(secondaryHandshakeClient);
+            factoryMock.Setup(f => f.CreateHttpClient())
+                .Returns(mockClient)
+                .Verifiable();
 
             var socketFactoryMock = new Mock<IClientSocketFactory>();
 
@@ -287,20 +279,19 @@ namespace IBM.SocketIO.Tests
         public async Task HandleThirdHandshakeFailureCorrectly()
         {
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
-            var initialHandshakeClient = new MockHttpClient(initialHandshakeResponse, HttpStatusCode.OK);
-
             var secondaryHandshakeResponse = "ok";
-            var secondaryHandshakeClient = new MockHttpClient(secondaryHandshakeResponse, HttpStatusCode.OK);
-
             var protocolUpgradeResponse = "";
-            var protocolUpgradeClient = new MockHttpClient(protocolUpgradeResponse, HttpStatusCode.RequestTimeout);
-            protocolUpgradeClient.AddHeader("Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=");
+
+            var mockClient = new MockHttpClient(new MockHttpResponse[] {
+                new MockHttpResponse { DataToReturn = initialHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = secondaryHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = protocolUpgradeResponse, Code = HttpStatusCode.RequestTimeout, Headers = new Dictionary<string, string> { { "Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=" } } },
+            });
 
             var factoryMock = new Mock<IHttpClientFactory>();
-            factoryMock.SetupSequence(f => f.CreateHttpClient())
-                .Returns(initialHandshakeClient)
-                .Returns(secondaryHandshakeClient)
-                .Returns(protocolUpgradeClient);
+            factoryMock.Setup(f => f.CreateHttpClient())
+                .Returns(mockClient)
+                .Verifiable();
 
             var socketFactoryMock = new Mock<IClientSocketFactory>();
 
@@ -316,25 +307,22 @@ namespace IBM.SocketIO.Tests
         public async Task HandleFinalHandshakeFailureCorrectly()
         {
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
-            var initialHandshakeClient = new MockHttpClient(initialHandshakeResponse, HttpStatusCode.OK);
-
             var secondaryHandshakeResponse = "ok";
-            var secondaryHandshakeClient = new MockHttpClient(secondaryHandshakeResponse, HttpStatusCode.OK);
-
             var protocolUpgradeResponse = "";
-            var protocolUpgradeClient = new MockHttpClient(protocolUpgradeResponse, HttpStatusCode.SwitchingProtocols);
-            protocolUpgradeClient.AddHeader("Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=");
-
             var finalHandshakeResponse = "1:6";
-            var finalHandshakeClient = new MockHttpClient(finalHandshakeResponse, HttpStatusCode.RequestTimeout);
+
+            var mockClient = new MockHttpClient(new MockHttpResponse[] {
+                new MockHttpResponse { DataToReturn = initialHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = secondaryHandshakeResponse, Code = HttpStatusCode.OK },
+                new MockHttpResponse { DataToReturn = protocolUpgradeResponse, Code = HttpStatusCode.SwitchingProtocols, Headers = new Dictionary<string, string> { { "Sec-Websocket-Accept", "RWZIQcMHYHEyvemvvKIkivC1Tvo=" } } },
+                new MockHttpResponse { DataToReturn = finalHandshakeResponse, Code = HttpStatusCode.RequestTimeout },
+            });
 
             var factoryMock = new Mock<IHttpClientFactory>();
-            factoryMock.SetupSequence(f => f.CreateHttpClient())
-                    .Returns(initialHandshakeClient)
-                    .Returns(secondaryHandshakeClient)
-                    .Returns(protocolUpgradeClient)
-                    .Returns(finalHandshakeClient);
-
+            factoryMock.Setup(f => f.CreateHttpClient())
+                .Returns(mockClient)
+                .Verifiable();
+                
             var socketFactoryMock = new Mock<IClientSocketFactory>();
 
             var mediator = new SocketMediator("ws://localhost:7200/collections");

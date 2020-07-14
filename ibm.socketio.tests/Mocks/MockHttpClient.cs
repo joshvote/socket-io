@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -8,19 +9,29 @@ using IBM.Webclient;
 
 namespace IBM.SocketIO.Tests.Mocks
 {
+    public class MockHttpResponse
+    {
+        public string DataToReturn { get; set; }
+        public HttpStatusCode Code { get; set; }
+        public Dictionary<string, string> Headers { get; set; }
+    }
+
     public class MockHttpClient : IHttpClient
     {
         #region Private Members
 
-        private string dataToReturn = null;
-        private HttpStatusCode code = default(HttpStatusCode);
         private Dictionary<string, string> headers = new Dictionary<string, string>();
+        private ConcurrentQueue<MockHttpResponse> mockedResponses = new ConcurrentQueue<MockHttpResponse>();
+
         #endregion
 
         public MockHttpClient(string dataToReturn, HttpStatusCode code)
+            : this(new MockHttpResponse[] { new MockHttpResponse { DataToReturn = dataToReturn, Code = code } })
+        { }
+
+        public MockHttpClient(IEnumerable<MockHttpResponse> sequencedResponses)
         {
-            this.dataToReturn = dataToReturn;
-            this.code = code;
+            mockedResponses = new ConcurrentQueue<MockHttpResponse>(sequencedResponses);
         }
 
         public void Dispose()
@@ -34,16 +45,27 @@ namespace IBM.SocketIO.Tests.Mocks
 
         public virtual Task<HttpResponseMessage> SendAsync(HttpRequestMessage message, CancellationToken token)
         {
-            var response = new HttpResponseMessage(this.code);
-
-            foreach(var header in this.headers)
+            if (!mockedResponses.TryDequeue(out MockHttpResponse mockResponse))
             {
-                response.Headers.Add(header.Key, header.Value);
+                throw new Exception("Mock Exception - too many calls");
             }
 
-            response.Content = new StringContent(this.dataToReturn);
+            var responseMessage = new HttpResponseMessage(mockResponse.Code);
+            foreach(var header in this.headers)
+            {
+                responseMessage.Headers.Add(header.Key, header.Value);
+            }
+            if (mockResponse.Headers != null)
+            {
+                foreach (var header in mockResponse.Headers)
+                {
+                    responseMessage.Headers.Add(header.Key, header.Value);
+                }
+            }
 
-            return Task.FromResult(response);
+            responseMessage.Content = new StringContent(mockResponse.DataToReturn);
+
+            return Task.FromResult(responseMessage);
         }
     }
 }
