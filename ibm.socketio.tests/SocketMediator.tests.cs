@@ -6,21 +6,19 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using IBM.Webclient;
 using IBM.SocketIO.Tests.Mocks;
 using IBM.SocketIO.Factories;
 using IBM.SocketIO.Impl;
-using IBM.SocketIO.Tests.Extensions;
 using IBM.SocketIO.Tests.MockData;
+using Xunit;
 
 namespace IBM.SocketIO.Tests
 {
-    [TestClass]
     public class SocketMediatorTests
     {
-        [TestMethod]
+        [Fact]
         public async Task HandlesConnectionUpgradeFailureCorrectly()
         {
             // 1. Initial handshake
@@ -59,13 +57,14 @@ namespace IBM.SocketIO.Tests
 
 
             var mediator = new SocketMediator("ws://localhost:7200/collections");
-            await AsyncAssert.Throws<HttpRequestException>(
+            
+            await Assert.ThrowsAsync<HttpRequestException>(
                 () => mediator.InitConnection(factoryMock.Object, socketFactoryMock.Object));
 
             Mock.VerifyAll(socketMock, socketFactoryMock, factoryMock);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task LoadsAndStreamsDataCorrectly()
         {
             // 1. Initial handshake
@@ -134,7 +133,7 @@ namespace IBM.SocketIO.Tests
             Mock.VerifyAll(socketMock, socketFactoryMock, factoryMock);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Handles2ProbeFailureCorrectly()
         {
             // 1. Initial handshake
@@ -190,13 +189,13 @@ namespace IBM.SocketIO.Tests
 
 
             var mediator = new SocketMediator("ws://localhost:7200/collections");
-            await AsyncAssert.Throws<HttpRequestException>(
+            await Assert.ThrowsAsync<HttpRequestException>(
                 () => mediator.InitConnection(factoryMock.Object, socketFactoryMock.Object));
 
             Mock.VerifyAll(socketMock, socketFactoryMock, factoryMock);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Handles2ProbeSendFailureCorrectly()
         {
             // 1. Initial handshake
@@ -236,13 +235,13 @@ namespace IBM.SocketIO.Tests
 
 
             var mediator = new SocketMediator("ws://localhost:7200/collections");
-            await AsyncAssert.Throws<HttpRequestException>(
+            await Assert.ThrowsAsync<HttpRequestException>(
                 () => mediator.InitConnection(factoryMock.Object, socketFactoryMock.Object));
 
             Mock.VerifyAll(socketMock, socketFactoryMock, factoryMock);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task HandleFirstHandshakeFailureCorrectly()
         {
             var initialHandshakeClient = new MockHttpClient("", HttpStatusCode.RequestTimeout);
@@ -255,13 +254,13 @@ namespace IBM.SocketIO.Tests
 
             var mediator = new SocketMediator("ws://localhost:7200/collections");
 
-            await AsyncAssert.Throws<HttpRequestException>(
+            await Assert.ThrowsAsync<HttpRequestException>(
                 () => mediator.InitConnection(factoryMock.Object, socketFactoryMock.Object));
 
             Mock.VerifyAll(factoryMock);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task HandleSecondHandshakeFailureCorrectly()
         {
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
@@ -278,13 +277,13 @@ namespace IBM.SocketIO.Tests
 
             var mediator = new SocketMediator("ws://localhost:7200/collections");
 
-            await AsyncAssert.Throws<HttpRequestException>(
+            await Assert.ThrowsAsync<HttpRequestException>(
                 () => mediator.InitConnection(factoryMock.Object, socketFactoryMock.Object));
 
             Mock.VerifyAll(factoryMock);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task HandleThirdHandshakeFailureCorrectly()
         {
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
@@ -307,13 +306,13 @@ namespace IBM.SocketIO.Tests
 
             var mediator = new SocketMediator("ws://localhost:7200/collections");
 
-            await AsyncAssert.Throws<HttpRequestException>(
+            await Assert.ThrowsAsync<HttpRequestException>(
                 () => mediator.InitConnection(factoryMock.Object, socketFactoryMock.Object));
 
             Mock.VerifyAll(factoryMock);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task HandleFinalHandshakeFailureCorrectly()
         {
             var initialHandshakeResponse = "96:0{ \"sid\":\"i4VXx68U4C_w6qiFAAAm\",\"upgrades\":[\"websocket\"],\"pingInterval\":25000,\"pingTimeout\":5000}2:40";
@@ -340,7 +339,7 @@ namespace IBM.SocketIO.Tests
 
             var mediator = new SocketMediator("ws://localhost:7200/collections");
 
-            await AsyncAssert.Throws<HttpRequestException>(
+            await Assert.ThrowsAsync<HttpRequestException>(
                 () => mediator.InitConnection(factoryMock.Object, socketFactoryMock.Object));
 
             Mock.VerifyAll(factoryMock);

@@ -13,6 +13,7 @@ using System.Net;
 using System.Linq;
 using IBM.SocketIO.Factories;
 using IBM.Webclient;
+using IBM.SocketIO.Exceptions;
 
 namespace IBM.SocketIO.Impl
 {
@@ -137,7 +138,8 @@ namespace IBM.SocketIO.Impl
                     {
                         response.EnsureSuccessStatusCode();
                         var ok = await response.Content.ReadAsStringAsync();
-                        Debug.Assert(ok.Equals("ok"));
+                        if (ok != "ok")
+                            throw new InvalidResponseException($"Expected 'ok' - got '{ok}'");
                     }
                 }
                 catch (Exception ex)
